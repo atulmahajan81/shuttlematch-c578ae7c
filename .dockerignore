@@ -1,0 +1,10 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+build
+venv
+node_modules
+.DS_Store
+/tests
