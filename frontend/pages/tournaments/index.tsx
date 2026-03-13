@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../../lib/context/auth';
-import { useTournaments } from '../../lib/hooks/useTournaments';
+import { useAuth } from '@/context/AuthContext';
+import { useTournaments } from '@/lib/hooks/useTournaments';
 
-export default function TournamentsPage() {
+const Tournaments = () => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
-  const { data, isLoading, error } = useTournaments();
+  const { data: tournaments, isLoading, isError } = useTournaments();
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -14,25 +14,23 @@ export default function TournamentsPage() {
     }
   }, [isAuthenticated, router]);
 
-  if (isLoading) return <div>Loading tournaments...</div>;
-  if (error) return <div>Error loading tournaments: {error.message}</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading tournaments</div>;
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Tournaments</h1>
-      {data?.length === 0 ? (
-        <p>No tournaments available.</p>
-      ) : (
-        <ul className="space-y-4">
-          {data.map(tournament => (
-            <li key={tournament.id} className="bg-white p-4 rounded shadow">
-              <h2 className="text-xl font-semibold">{tournament.name}</h2>
-              <p>Location: {tournament.location}</p>
-              <p>Date: {tournament.date}</p>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Tournaments</h1>
+      <ul>
+        {tournaments?.map(tournament => (
+          <li key={tournament.id} className="mb-2">
+            <a href={`/tournaments/${tournament.id}`} className="text-blue-500">
+              {tournament.name} - {tournament.location}
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
+
+export default Tournaments;

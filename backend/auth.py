@@ -8,7 +8,7 @@ from pydantic import BaseSettings, Field
 
 class Settings(BaseSettings):
     SECRET_KEY: str = Field(..., env='SECRET_KEY')
-    ALGORITHM: str = "HS256"
+    ALGORITHM: str = "RS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 1440
 

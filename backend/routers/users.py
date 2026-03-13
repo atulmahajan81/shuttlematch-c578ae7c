@@ -9,7 +9,7 @@ from backend.schemas import UserOut, UserUpdate
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
-@router.get("/", response_model=list[UserOut])
+@router.get("/", response_model=list[UserOut], response_model_exclude_unset=True)
 async def read_users(
     db: AsyncSession = Depends(get_db),
     pagination: dict = Depends(pagination_params),
@@ -25,28 +25,3 @@ async def read_user(id: str, db: AsyncSession = Depends(get_db)) -> UserOut:
     if user is None:
         raise NotFoundException(detail="User not found")
     return UserOut.from_orm(user)
-
-@router.put("/{id}", response_model=UserOut)
-async def update_user(id: str, user_update: UserUpdate, db: AsyncSession = Depends(get_db)) -> UserOut:
-    result = await db.execute(select(User).where(User.id == id))
-    user = result.scalar_one_or_none()
-    if user is None:
-        raise NotFoundException(detail="User not found")
-
-    for key, value in user_update.dict(exclude_unset=True).items():
-        setattr(user, key, value)
-
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
-    return UserOut.from_orm(user)
-
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(id: str, db: AsyncSession = Depends(get_db)) -> None:
-    result = await db.execute(select(User).where(User.id == id))
-    user = result.scalar_one_or_none()
-    if user is None:
-        raise NotFoundException(detail="User not found")
-
-    await db.delete(user)
-    await db.commit()

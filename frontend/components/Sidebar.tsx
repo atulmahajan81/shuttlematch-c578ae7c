@@ -1,29 +1,30 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { useRouter } from 'next/router';
 
 const Sidebar: React.FC = () => {
-  const links = [
+  const router = useRouter();
+  const menuItems = [
     { name: 'Dashboard', path: '/' },
     { name: 'Tournaments', path: '/tournaments' },
     { name: 'Players', path: '/players' },
     { name: 'Matches', path: '/matches' },
+    { name: 'Scores', path: '/scores' },
   ];
 
   return (
-    <div className="w-64 bg-white shadow-md">
-      <nav className="space-y-2 py-4">
-        {links.map(link => (
-          <NavLink
-            key={link.name}
-            to={link.path}
-            className={({ isActive }) =>
-              `block px-4 py-2 rounded-lg ${isActive ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-200'}`
-            }
+    <div className="w-64 bg-blue-800 text-white flex-none">
+      <div className="p-6 text-xl font-bold">ShuttleMatch</div>
+      <ul className="space-y-2">
+        {menuItems.map((item) => (
+          <li
+            key={item.name}
+            className={`px-4 py-2 hover:bg-blue-700 cursor-pointer ${router.pathname === item.path && 'bg-blue-900'}`}
+            onClick={() => router.push(item.path)}
           >
-            {link.name}
-          </NavLink>
+            {item.name}
+          </li>
         ))}
-      </nav>
+      </ul>
     </div>
   );
 };

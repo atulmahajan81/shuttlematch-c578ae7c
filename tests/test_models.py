@@ -1,43 +1,36 @@
 # test_models.py
-
 import pytest
 from sqlalchemy.exc import IntegrityError
+from backend.models import User, Tournament, Match, Score
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.models import User, Tournament, Match
-
-
 @pytest.mark.asyncio
-async def test_user_model(async_session: AsyncSession):
-    """Test the User model for constraints and relationships."""
-    user = User(email="unique@example.com", password_hash="hashed_password", role="user")
-    async_session.add(user)
-    await async_session.commit()
-
-    # Test uniqueness constraint
+async def test_user_model_constraints(db_session: AsyncSession):
+    """Test User model unique constraint on email field"""
+    user1 = User(email="duplicate@test.com", password_hash="hashedpassword", role="user")
+    user2 = User(email="duplicate@test.com", password_hash="hashedpassword", role="user")
+    db_session.add(user1)
+    await db_session.commit()
+    db_session.add(user2)
     with pytest.raises(IntegrityError):
-        duplicate_user = User(email="unique@example.com", password_hash="hashed_password", role="user")
-        async_session.add(duplicate_user)
-        await async_session.commit()
-
+        await db_session.commit()
 
 @pytest.mark.asyncio
-async def test_tournament_model(async_session: AsyncSession):
-    """Test the Tournament model for constraints and relationships."""
-    tournament = Tournament(name="Open Tournament", location="City", date="2023-01-01")
-    async_session.add(tournament)
-    await async_session.commit()
-
+async def test_tournament_model_relationship(db_session: AsyncSession):
+    """Test Tournament model has many Matches relationship"""
+    tournament = Tournament(name="Test Tournament", location="Test Location", date="2023-10-01")
+    match = Match(tournament_id=tournament.id, player1_id="1", player2_id="2", scheduled_time="2023-10-01T10:00:00")
+    tournament.matches.append(match)
+    db_session.add(tournament)
+    await db_session.commit()
+    assert len(tournament.matches) == 1
 
 @pytest.mark.asyncio
-async def test_match_model(async_session: AsyncSession):
-    """Test the Match model for constraints and relationships."""
-    tournament = Tournament(name="Open Tournament", location="City", date="2023-01-01")
-    async_session.add(tournament)
-    await async_session.commit()
-
-    match = Match(
-        tournament_id=tournament.id, player1_id="uuid-player1", player2_id="uuid-player2", scheduled_time="2023-01-01T10:00:00"
-    )
-    async_session.add(match)
-    await async_session.commit()
+async def test_match_model_relationship(db_session: AsyncSession):
+    """Test Match model belongs to Tournament relationship"""
+    tournament = Tournament(name="Test Tournament", location="Test Location", date="2023-10-01")
+    match = Match(tournament_id=tournament.id, player1_id="1", player2_id="2", scheduled_time="2023-10-01T10:00:00")
+    db_session.add(tournament)
+    db_session.add(match)
+    await db_session.commit()
+    assert match.tournament_id == tournament.id

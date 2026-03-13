@@ -2,14 +2,13 @@ import React from 'react';
 
 const Navbar: React.FC = () => {
   return (
-    <div className="bg-white shadow-md h-16 flex items-center justify-between px-6">
-      <div className="text-xl font-semibold">ShuttleMatch</div>
-      <div className="flex items-center space-x-4">
-        <div className="relative">
-          <span className="text-gray-500">User</span>
-        </div>
+    <nav className="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div className="text-lg font-semibold">ShuttleMatch Dashboard</div>
+      <div className="flex items-center">
+        <div className="text-gray-600 mr-4">Welcome, User!</div>
+        <button className="bg-blue-500 text-white px-4 py-2 rounded-md">Logout</button>
       </div>
-    </div>
+    </nav>
   );
 };
 

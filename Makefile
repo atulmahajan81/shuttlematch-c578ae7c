@@ -1,11 +1,13 @@
+.PHONY: dev test deploy migrate
+
 dev:
-	docker-compose -f docker-compose.yml -f docker-compose.override.yml up --build
+	docker-compose up
 
 test:
-	pytest --cov=backend
+	pytest --cov=backend tests/
 
 migrate:
-	bash scripts/migrate.sh
+	./scripts/migrate.sh
 
 deploy:
-	bash scripts/deploy.sh
+	./scripts/deploy.sh

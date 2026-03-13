@@ -6,9 +6,6 @@ from ..schemas import TournamentCreate, TournamentRead
 
 
 async def create_tournament(session: AsyncSession, tournament_data: TournamentCreate) -> TournamentRead:
-    """
-    Create a new tournament in the database.
-    """
     new_tournament = Tournament(
         name=tournament_data.name,
         location=tournament_data.location,
@@ -21,9 +18,6 @@ async def create_tournament(session: AsyncSession, tournament_data: TournamentCr
 
 
 async def get_tournament(session: AsyncSession, tournament_id: UUID) -> TournamentRead:
-    """
-    Retrieve a tournament by its ID.
-    """
     query = select(Tournament).where(Tournament.id == tournament_id)
     result = await session.execute(query)
     tournament = result.scalars().first()
@@ -31,9 +25,6 @@ async def get_tournament(session: AsyncSession, tournament_id: UUID) -> Tourname
 
 
 async def list_tournaments(session: AsyncSession, skip: int = 0, limit: int = 10) -> list[TournamentRead]:
-    """
-    List all tournaments with pagination.
-    """
     query = select(Tournament).offset(skip).limit(limit)
     result = await session.execute(query)
     tournaments = result.scalars().all()

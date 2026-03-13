@@ -1,82 +1,27 @@
 # test_tournaments.py
-
 import pytest
 from httpx import AsyncClient
 
-
 @pytest.mark.asyncio
-async def test_create_tournament(client: AsyncClient):
-    """Test tournament creation with valid data."""
-    # Register and login the user
-    await client.post(
-        "/api/v1/auth/register",
-        json={"email": "test@example.com", "password": "strongpassword", "role": "user"}
-    )
-    login_response = await client.post(
-        "/api/v1/auth/login",
-        json={"email": "test@example.com", "password": "strongpassword"}
-    )
-    access_token = login_response.json()["access_token"]
-    headers = {"Authorization": f"Bearer {access_token}"}
-    # Create tournament
-    response = await client.post(
-        "/api/v1/tournaments",
-        headers=headers,
-        json={"name": "Test Tournament", "location": "Test Location", "date": "2023-01-01"}
-    )
+async def test_create_tournament(async_client: AsyncClient, auth_headers):
+    """Test creating a new tournament with valid data"""
+    response = await async_client.post("/api/v1/tournaments", json={"name": "Open Championship", "location": "City Arena", "date": "2023-10-01"}, headers=auth_headers)
     assert response.status_code == 200
     assert "id" in response.json()
-    assert response.json()["name"] == "Test Tournament"
-
+    assert response.json()["name"] == "Open Championship"
 
 @pytest.mark.asyncio
-async def test_list_tournaments(client: AsyncClient):
-    """Test listing all tournaments."""
-    # Register and login the user
-    await client.post(
-        "/api/v1/auth/register",
-        json={"email": "test@example.com", "password": "strongpassword", "role": "user"}
-    )
-    login_response = await client.post(
-        "/api/v1/auth/login",
-        json={"email": "test@example.com", "password": "strongpassword"}
-    )
-    access_token = login_response.json()["access_token"]
-    headers = {"Authorization": f"Bearer {access_token}"}
-    # List tournaments
-    response = await client.get(
-        "/api/v1/tournaments",
-        headers=headers
-    )
+async def test_list_tournaments(async_client: AsyncClient, auth_headers):
+    """Test listing all tournaments with pagination"""
+    response = await async_client.get("/api/v1/tournaments?page=1&limit=10", headers=auth_headers)
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
-
 @pytest.mark.asyncio
-async def test_get_tournament_details(client: AsyncClient):
-    """Test retrieving tournament details."""
-    # Register and login the user
-    await client.post(
-        "/api/v1/auth/register",
-        json={"email": "test@example.com", "password": "strongpassword", "role": "user"}
-    )
-    login_response = await client.post(
-        "/api/v1/auth/login",
-        json={"email": "test@example.com", "password": "strongpassword"}
-    )
-    access_token = login_response.json()["access_token"]
-    headers = {"Authorization": f"Bearer {access_token}"}
-    # Create tournament
-    create_response = await client.post(
-        "/api/v1/tournaments",
-        headers=headers,
-        json={"name": "Test Tournament", "location": "Test Location", "date": "2023-01-01"}
-    )
+async def test_get_tournament_details(async_client: AsyncClient, auth_headers):
+    """Test retrieving tournament details with valid ID"""
+    create_response = await async_client.post("/api/v1/tournaments", json={"name": "Open Championship", "location": "City Arena", "date": "2023-10-01"}, headers=auth_headers)
     tournament_id = create_response.json()["id"]
-    # Get tournament details
-    response = await client.get(
-        f"/api/v1/tournaments/{tournament_id}",
-        headers=headers
-    )
+    response = await async_client.get(f"/api/v1/tournaments/{tournament_id}", headers=auth_headers)
     assert response.status_code == 200
     assert response.json()["id"] == tournament_id

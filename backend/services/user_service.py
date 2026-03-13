@@ -19,9 +19,6 @@ def get_password_hash(password: str) -> str:
 
 @redis_cache(ttl=300)
 async def create_user(session: AsyncSession, user_data: UserCreate) -> UserRead:
-    """
-    Create a new user in the database.
-    """
     query = select(User).filter(User.email == user_data.email)
     result = await session.execute(query)
     existing_user = result.scalars().first()
@@ -32,5 +29,3 @@ async def create_user(session: AsyncSession, user_data: UserCreate) -> UserRead:
     new_user = User(email=user_data.email, hashed_password=hashed_password, role=user_data.role)
     session.add(new_user)
     await session.commit()
-    await session.refresh(new_user)
-    return UserRead.from_or

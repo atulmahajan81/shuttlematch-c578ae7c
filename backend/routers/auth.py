@@ -25,6 +25,3 @@ async def register(user_create: UserCreate, db: AsyncSession = Depends(get_db)) 
     await db.refresh(db_user)
     send_email_task.delay(db_user.email)
     return UserOut.from_orm(db_user)
-
-@router.post("/login", response_model=TokenOut)
-async def login(form_data: UserCreate, d

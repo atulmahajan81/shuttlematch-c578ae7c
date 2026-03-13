@@ -17,19 +17,12 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 @app.on_event("startup")
 async def startup_event():
-    """
-    Actions to perform at startup.
-    """
     # Initialize database connections, etc.
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """
-    Actions to perform at shutdown.
-    """
     # Close database connections, cleanup, etc.
 
-# Include routers
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(tournament.router)

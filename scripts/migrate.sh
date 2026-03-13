@@ -3,4 +3,5 @@
 set -e
 
 # Run database migrations
-alembic upgrade head
+echo "Running database migrations..."
+docker-compose run --rm api alembic upgrade head

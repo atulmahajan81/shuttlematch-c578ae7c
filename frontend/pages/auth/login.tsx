@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { setToken } from '../../lib/utils/auth';
+import { useAuth } from '@/context/AuthContext';
 
-export default function LoginPage() {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { setToken } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       const response = await axios.post('/api/v1/auth/login', { email, password });
       setToken(response.data.access_token);
@@ -21,39 +22,30 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h1 className="text-2xl mb-6 text-center">Login</h1>
-        {error && <div className="mb-4 text-red-600">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:ring-indigo-200"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:ring-indigo-200"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+    <div className="max-w-md mx-auto p-4">
+      <h1 className="text-xl font-bold mb-4">Login</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 border mb-2"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 border mb-2"
+        />
+        {error && <div className="text-red-500 mb-2">{error}</div>}
+        <button type="submit" className="w-full bg-blue-500 text-white p-2">
+          Login
+        </button>
+      </form>
     </div>
   );
-}
+};
+
+export default Login;

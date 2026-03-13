@@ -1,41 +1,45 @@
 # ShuttleMatch Database
 
-This document provides an overview of the database schema for the ShuttleMatch application, including information on the tables, their columns, relationships, and indexes.
+This document outlines the database schema for ShuttleMatch, a sports management platform for badminton tournaments.
 
-## Schema Overview
+## Schema Diagram Description
 
-- **Users**: Represents a user in the system with attributes like email, password hash, and role.
-- **Tournaments**: Represents a badminton tournament with attributes like name, location, and date.
-- **Matches**: Represents matches in a tournament, including scheduled time and player associations.
-- **Scores**: Represents scores for each match.
+- **Users**: Contains user information. Each user has a unique email, password hash, and role (either 'admin' or 'user').
+- **Tournaments**: Details of badminton tournaments, including name, location, and date. Each tournament can have multiple matches.
+- **Matches**: Represents a match between two players in a tournament. It stores references to the tournament and the players participating.
+- **Scores**: Stores the scores for each match.
 
-## Database Setup
+## Setup Instructions
 
-1. Ensure PostgreSQL is installed and running on your machine.
-2. Create a database named `dbname`.
-3. Use the provided `schema.sql` file to create the necessary tables and triggers.
-4. Use Alembic to apply migrations:
+1. **Database Initialization**:
+   - Ensure PostgreSQL is installed and running.
+   - Run the schema.sql to create the database schema.
+
+   ```bash
+   psql -U your_username -d shuttlematch -f database/schema.sql
+   ```
+
+2. **Apply Migrations**:
+   - Configure your database URL in `alembic.ini`.
+   - Run Alembic migrations to ensure the database is up to date.
+
    ```bash
    alembic upgrade head
    ```
-5. Seed the database with initial data using either the Python script `seed_data.py` or SQL `seed_data.sql`.
-6. Configure the application to connect to the database using the connection string in `alembic.ini`.
 
-## Indexes and Performance
+3. **Seed Data**:
+   - Insert initial data using the provided seed scripts.
 
-- Indexes are created on important columns like email, tournament_id, and scheduled_time to optimize query performance.
-- Composite and partial indexes are used to improve scalability and speed for common query patterns.
+   ```bash
+   python database/seeds/seed_data.py
+   ```
+   or
+   ```bash
+   psql -U your_username -d shuttlematch -f database/seeds/seed_data.sql
+   ```
 
-## Triggers
+## Scalability Considerations
 
-- A trigger is set up on each table to automatically update the `updated_at` timestamp when a record is modified.
-
-## Async Configuration
-
-- Alembic is configured to work with SQLAlchemy asynchronously using `asyncpg`.
-- The `env.py` file is set up to handle both offline and online migrations.
-
-## Seeding Data
-
-- Seed data can be added using the `seed_data.py` script which connects to the database asynchronously.
-- Alternatively, the `seed_data.sql` script can be used for direct SQL injection of seed data.
+- **Caching Strategy**: Implement Redis caching for frequently accessed data, with a 5-minute TTL.
+- **Database Indexing**: Indexes are created on email, tournament_id, and scheduled_time for performance optimization.
+- **Asynchronous Tasks**: Use Celery for handling background jobs efficiently.

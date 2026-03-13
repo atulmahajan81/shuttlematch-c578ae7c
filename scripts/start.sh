@@ -1,19 +1,18 @@
 #!/bin/bash
 
-set -e
-
 # Check prerequisites
 if ! command -v docker &> /dev/null
 then
-    echo "Docker could not be found"
+    echo "Docker could not be found. Please install Docker."
     exit
 fi
 
 if ! command -v docker-compose &> /dev/null
 then
-    echo "docker-compose could not be found"
+    echo "Docker Compose could not be found. Please install Docker Compose."
     exit
 fi
 
 # Start services
-docker-compose up --build
+set -e
+docker-compose up
